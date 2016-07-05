@@ -1,0 +1,54 @@
+---
+- name: create users
+  uri:
+    url: "{{ couchdb_url }}/_users"
+    method: POST
+    user: "{{ couchdb_admins.items()[0][0] | default(omit) }}"
+    password: "{{ couchdb_admins.items()[0][1] | default(omit) }}"
+    force_basic_auth: "{{ couchdb_admins | length > 0 }}"
+    body_format: json
+    body:
+      _id: "org.couchdb.user:{{ item.key }}"
+      type: user
+      name: "{{ item.key }}"
+      password: "{{ item.value.password }}"
+      roles: "{{ item.value.roles | default([]) }}"
+    status_code: 201,202,409
+  with_dict: "{{ couchdb_users }}"
+
+- name: create databases
+  uri:
+    url: "{{ couchdb_url }}/{{ item.key }}"
+    method: PUT
+    user: "{{ couchdb_admins.items()[0][0] | default(omit) }}"
+    password: "{{ couchdb_admins.items()[0][1] | default(omit) }}"
+    force_basic_auth: "{{ couchdb_admins | length > 0 }}"
+    status_code: 201,412
+  with_dict: "{{ couchdb_databases }}"
+
+- name: secure databases
+  uri:
+    url: "{{ couchdb_url }}/{{ item.key }}/_security"
+    method: PUT
+    user: "{{ couchdb_admins.items()[0][0] | default(omit) }}"
+    password: "{{ couchdb_admins.items()[0][1] | default(omit) }}"
+    force_basic_auth: "{{ couchdb_admins | length > 0 }}"
+    body_format: json
+    body:
+      admins: "{{ item.value.admins | default({}) }}"
+      members: "{{ item.value.members | default({}) }}"
+    status_code: 200
+  with_dict: "{{ couchdb_databases }}"
+  when: "{{ 'admins' in item.value or 'members' in item.value }}"
+
+- name: setup replication
+  uri:
+    url: "{{ couchdb_url }}/_replicator"
+    method: POST
+    user: "{{ couchdb_admins.items()[0][0] | default(omit) }}"
+    password: "{{ couchdb_admins.items()[0][1] | default(omit) }}"
+    force_basic_auth: "{{ couchdb_admins | length > 0 }}"
+    body_format: json
+    body: "{{ item }}"
+    status_code: 201,202,409
+  with_items: "{{ couchdb_replication }}"

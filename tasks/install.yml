@@ -1,0 +1,64 @@
+---
+- name: add couchdb PPA repository
+  become: yes
+  apt_repository:
+    repo: ppa:couchdb/stable
+
+- name: install couchdb
+  become: yes
+  apt:
+    name: couchdb
+  register: couchdb_install
+
+- name: stop couchdb
+  become: yes
+  command: stop couchdb
+  when: couchdb_install.changed
+
+- name: change owner of couchdb executable
+  file:
+    state: file
+    mode: 0770
+    owner: couchdb
+    group: couchdb
+    path: /usr/bin/couchdb
+  when: couchdb_install.changed
+
+- name: secure couchdb installation
+  file:
+    state: directory
+    mode: 0770
+    owner: couchdb
+    group: couchdb
+    path: "{{ item }}"
+  with_items:
+    - /usr/lib/couchdb
+    - /usr/share/couchdb
+    - /etc/couchdb
+  when: couchdb_install.changed
+
+- name: start couchdb
+  become: yes
+  command: start couchdb
+  when: couchdb_install.changed
+
+- name: setup admins
+  become: yes
+  lineinfile:
+    dest: /etc/couchdb/local.ini
+    state: present
+    line: "{{ item.key }} = {{ item.value }}"
+    regexp: "^{{ item.key }} = "
+    insertafter: "^\\[admins\\]$"
+  with_dict: "{{ couchdb_admins }}"
+  notify: restart couchdb
+
+- name: create configuration file
+  become: yes
+  template:
+    src: config.ini
+    dest: /etc/couchdb/local.d/config.ini
+    mode: 0770
+    owner: couchdb
+    group: couchdb
+  notify: restart couchdb

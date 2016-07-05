@@ -1,0 +1,21 @@
+galaxy_info:
+  author: Chialab srl <dev@chialab.io>
+  description: Ansible role to deploy a CouchDB cluster
+  company: Chialab srl
+
+  issue_tracker_url: https://github.com/Chialab/ansible-couchdb/issues
+  license: MIT
+
+  min_ansible_version: 2.0
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - trusty
+
+  galaxy_tags:
+    - couchdb
+    - nosql
+    - database
+
+dependencies: []

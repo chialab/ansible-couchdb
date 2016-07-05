@@ -1,0 +1,4 @@
+---
+- name: restart couchdb
+  become: yes
+  command: restart couchdb

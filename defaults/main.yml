@@ -1,0 +1,12 @@
+---
+couchdb_url: "http://localhost:5984"
+couchdb_settings:
+  httpd:
+    port: "5984"
+    bind_address: "127.0.0.1"
+
+couchdb_admins: {}
+couchdb_users: {}
+
+couchdb_databases: {}
+couchdb_replication: []
