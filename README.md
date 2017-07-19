@@ -68,3 +68,11 @@ couchdb_replication:
 
 couchdb_url: "http://localhost:5984"
 ```
+
+Contributing
+------------
+
+Issues and pull requests are more than welcome!
+
+This repo is a split of the main code that can be found [here](https://github.com/Chialab/ansible-roles).
+Please, open pull requests against that repository instead.
