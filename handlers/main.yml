@@ -1,4 +1,6 @@
 ---
 - name: restart couchdb
   become: yes
-  command: restart couchdb
+  service:
+    name: couchdb
+    state: restarted
