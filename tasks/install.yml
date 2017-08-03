@@ -12,7 +12,9 @@
 
 - name: stop couchdb
   become: yes
-  command: stop couchdb
+  service:
+    name: couchdb
+    state: stopped
   when: couchdb_install.changed
 
 - name: change owner of couchdb executable
@@ -39,7 +41,9 @@
 
 - name: start couchdb
   become: yes
-  command: start couchdb
+  service:
+    name: couchdb
+    state: started
   when: couchdb_install.changed
 
 - name: setup admins
